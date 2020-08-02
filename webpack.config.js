@@ -7,8 +7,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const isProd = process.env.NODE_ENV === 'production';
 const isDev = !isProd;
 
-const filename = (ext) => (isDev ? `bundle.${ext}` : `bundle.[hash].${ext}`);
-
 const jsLoaders = () => {
   const loaders = [
     {
@@ -31,7 +29,7 @@ module.exports = {
   mode: 'development',
   entry: ['@babel/polyfill', './index.js'],
   output: {
-    filename: filename('js'),
+    filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
@@ -43,8 +41,10 @@ module.exports = {
   },
   devtool: isDev ? 'source-map' : false,
   devServer: {
-    port: 3000,
+    port: 4200,
     hot: isDev,
+    injectHot: (compilerConfig) => compilerConfig.name === 'only-include',
+    watchContentBase: true,
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -64,24 +64,14 @@ module.exports = {
       ],
     }),
     new MiniCssExtractPlugin({
-      filename: filename('css'),
+      filename: 'bundle.[hash].css',
     }),
   ],
   module: {
     rules: [
       {
         test: /\.s[ac]ss$/i,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: isDev,
-              reloadAll: true,
-            },
-          },
-          'css-loader',
-          'sass-loader',
-        ],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
         test: /\.js$/,
