@@ -5,6 +5,9 @@
     "browser": true,
     "node": true
   },
-  "rules": {},
+  "rules": {
+    "require-jsdoc": "off",
+    "operator-linebreak": "off"
+  },
   "extends": ["eslint:recommended", "google"]
 }
